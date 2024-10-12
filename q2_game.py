@@ -321,7 +321,7 @@ def show_level_complete_screen(level):
 def show_congratulations_screen(score):
     """Displays a congratulation screen upon defeating the boss."""
     screen.fill(BLACK)
-    congrats_text = font.render(f"Congratulations! You defeated the Boss!", True, WHITE)
+    congrats_text = font.render("Congratulations! You defeated the Boss!", True, WHITE)
     screen.blit(
         congrats_text,
         (SCREEN_WIDTH // 2 - congrats_text.get_width() // 2, SCREEN_HEIGHT // 2 - 50),
@@ -366,7 +366,7 @@ def show_congratulations_screen(score):
 def show_game_over_screen(score):
     """Displays the game over screen when the player loses all lives."""
     screen.fill(BLACK)
-    game_over_text = font.render(f"Game Over! You lost all your lives.", True, WHITE)
+    game_over_text = font.render("Game Over! You lost all your lives.", True, WHITE)
     screen.blit(
         game_over_text,
         (SCREEN_WIDTH // 2 - game_over_text.get_width() // 2, SCREEN_HEIGHT // 2 - 50),
@@ -408,9 +408,82 @@ def show_game_over_screen(score):
                     exit()
 
 
+# Pause screen function
+def pause_screen():
+    screen.fill(BLACK)
+    pause_text = font.render("Paused", True, WHITE)
+    resume_text = font.render("Press R to Resume or ESC to Exit", True, WHITE)
+
+    screen.blit(
+        pause_text,
+        (
+            (SCREEN_WIDTH // 2 - pause_text.get_width() // 2),
+            (SCREEN_HEIGHT // 2 - pause_text.get_height() // 2 - 30),
+        ),
+    )
+    screen.blit(
+        resume_text,
+        (
+            (SCREEN_WIDTH // 2 - resume_text.get_width() // 2),
+            (SCREEN_HEIGHT // 2 - resume_text.get_height() // 2 + 30),
+        ),
+    )
+    pygame.display.flip()
+
+    paused = True
+    while paused:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_r:
+                    paused = False  # Resume the game
+                elif event.key == pygame.K_ESCAPE:
+                    pygame.quit()
+                    exit()
+        clock.tick(5)  # Limit the frame rate while paused
+
+
+# Instruction screen function
+def instruction_screen():
+    screen.fill(BLACK)
+    title_text = font.render("Welcome to the Shooting Game", True, WHITE)
+    instruction_text = font.render("Instructions:", True, WHITE)
+    movement_text = font.render("Move: LEFT and RIGHT Arrow Keys", True, WHITE)
+    jump_text = font.render("Jump: UP Arrow Key", True, WHITE)
+    shoot_text = font.render("Shoot: SPACE Key", True, WHITE)
+    pause_text = font.render("Pause: ESC Key", True, WHITE)
+    start_text = font.render("Press any key to start", True, GREEN)
+
+    # Displaying text on screen
+    screen.blit(title_text, ((SCREEN_WIDTH - title_text.get_width()) // 2, 100))
+    screen.blit(
+        instruction_text, ((SCREEN_WIDTH - instruction_text.get_width()) // 2, 200)
+    )
+    screen.blit(movement_text, ((SCREEN_WIDTH - movement_text.get_width()) // 2, 250))
+    screen.blit(jump_text, ((SCREEN_WIDTH - jump_text.get_width()) // 2, 300))
+    screen.blit(shoot_text, ((SCREEN_WIDTH - shoot_text.get_width()) // 2, 350))
+    screen.blit(pause_text, ((SCREEN_WIDTH - pause_text.get_width()) // 2, 400))
+    screen.blit(start_text, ((SCREEN_WIDTH - start_text.get_width()) // 2, 500))
+
+    pygame.display.flip()
+
+    waiting = True
+    while waiting:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            if event.type == pygame.KEYDOWN:
+                waiting = False  # Exit the loop when a key is pressed
+
+
 # Main Game Loop
 def main():
     """Main game loop where player, enemies, and boss logic are handled."""
+
+    instruction_screen()
 
     player = Player()
     all_sprites = pygame.sprite.Group(player)
@@ -449,6 +522,8 @@ def main():
                         projectiles.add(projectile)
                 elif event.key == pygame.K_UP:
                     player.jump()
+                elif event.key == pygame.K_ESCAPE:
+                    pause_screen()
 
         all_sprites.update()
 
